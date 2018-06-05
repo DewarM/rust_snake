@@ -3,41 +3,25 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
+mod snake;
+mod input;
+
 use glutin_window::GlutinWindow as Window;
+use input::Press;
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
+use snake::Snake;
 
 pub const SPEED: f64 = 1.0;
 pub const BOARD_SIZE: u32 = 200;
 pub const TILE_SIZE: u32 = 20;
 pub const UPDATE_TIME: f64 = 0.15;
 
-struct Vector {
-    x: f64,
-    y: f64,
-}
-
-impl Vector {
-    fn add(&mut self, vec: &Vector) -> &mut Self {
-        self.x += vec.x;
-        self.y += vec.y;
-        self
-    }
-}
-
-enum Press {
-    Left,
-    Right,
-    Up,
-    Down,
-}
-
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
-    position: Vector,
-    velocity: Vector,
+    snake: Snake,
     current_press: Press,
     time: f64,
 }
@@ -50,8 +34,8 @@ impl App {
         const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
         let (x, y) = (
-            self.position.x * TILE_SIZE as f64,
-            self.position.y * TILE_SIZE as f64,
+            self.snake.position.x * TILE_SIZE as f64,
+            self.snake.position.y * TILE_SIZE as f64,
         );
         let square = rectangle::square(x, y, TILE_SIZE as f64);
 
@@ -71,34 +55,7 @@ impl App {
         if self.time > UPDATE_TIME {
             self.time = 0.0;
         }
-        match self.current_press {
-            Press::Left => {
-                self.velocity = Vector {
-                    x: -0.1 * SPEED,
-                    y: 0.0,
-                }
-            }
-            Press::Right => {
-                self.velocity = Vector {
-                    x: 0.1 * SPEED,
-                    y: 0.0,
-                }
-            }
-            Press::Up => {
-                self.velocity = Vector {
-                    x: 0.0,
-                    y: -0.1 * SPEED,
-                }
-            }
-            Press::Down => {
-                self.velocity = Vector {
-                    x: 0.0,
-                    y: 0.1 * SPEED,
-                }
-            }
-        }
-
-        self.position.add(&self.velocity);
+        self.snake.update(&mut self.current_press);
     }
 
     fn input(&mut self, button: &Button) {
@@ -130,11 +87,7 @@ fn main() {
     // Create a new game and run it.
     let mut app = App {
         gl: GlGraphics::new(opengl),
-        position: Vector { x: 0.0, y: 0.0 },
-        velocity: Vector {
-            x: 0.1 * SPEED,
-            y: 0.0,
-        },
+        snake: Snake::new(),
         current_press: Press::Right,
         time: 0.0,
     };
