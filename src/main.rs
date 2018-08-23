@@ -2,9 +2,12 @@ extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate rand;
 
 mod input;
 mod snake;
+mod vector;
+mod apple;
 
 use glutin_window::GlutinWindow as Window;
 use input::Press;
@@ -13,6 +16,7 @@ use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use snake::Snake;
+use apple::Apple;
 
 pub const SPEED: f64 = 1.0;
 pub const BOARD_SIZE: u32 = 200;
@@ -22,6 +26,7 @@ pub const UPDATE_TIME: f64 = 0.1;
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     snake: Snake,
+    apple: Apple,
     current_press: Press,
     time: f64,
 }
@@ -33,10 +38,19 @@ impl App {
         const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
         const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
-        let squares = self.snake.tail
-            .clone()
-            .into_iter()
-            .map(|vec| rectangle::square(vec.x * TILE_SIZE as f64, vec.y  * TILE_SIZE as f64, TILE_SIZE as f64));
+        let squares = self.snake.tail.clone().into_iter().map(|vec| {
+            rectangle::square(
+                vec.x * TILE_SIZE as f64,
+                vec.y * TILE_SIZE as f64,
+                TILE_SIZE as f64,
+            )
+        });
+
+        let apple = rectangle::square(
+                self.apple.position.x * TILE_SIZE as f64,
+                self.apple.position.y * TILE_SIZE as f64,
+                TILE_SIZE as f64,
+            );
 
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
@@ -46,12 +60,13 @@ impl App {
             for square in squares {
                 rectangle(RED, square, c.transform, gl);
             }
+            rectangle(RED, apple, c.transform, gl);
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) {
         self.time += args.dt;
-        self.snake.update_press(&mut self.current_press);
+        self.snake.update_direction(&mut self.current_press);
         if self.time > UPDATE_TIME {
             self.time = 0.0;
             self.snake.update();
@@ -88,6 +103,7 @@ fn main() {
     let mut app = App {
         gl: GlGraphics::new(opengl),
         snake: Snake::new(),
+        apple: Apple::new(),
         current_press: Press::Right,
         time: 0.0,
     };
