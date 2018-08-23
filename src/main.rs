@@ -4,19 +4,20 @@ extern crate opengl_graphics;
 extern crate piston;
 extern crate rand;
 
+mod apple;
 mod input;
 mod snake;
 mod vector;
-mod apple;
 
-use glutin_window::GlutinWindow as Window;
+use apple::Apple;
 use input::Press;
+use glutin_window::GlutinWindow as Window;
+
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use snake::Snake;
-use apple::Apple;
 
 pub const SPEED: f64 = 1.0;
 pub const BOARD_SIZE: u32 = 200;
@@ -36,32 +37,14 @@ impl App {
         use graphics::*;
 
         const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
-
-        let squares = self.snake.tail.clone().into_iter().map(|vec| {
-            rectangle::square(
-                vec.x * TILE_SIZE as f64,
-                vec.y * TILE_SIZE as f64,
-                TILE_SIZE as f64,
-            )
-        });
-
-        let apple = rectangle::square(
-                self.apple.position.x * TILE_SIZE as f64,
-                self.apple.position.y * TILE_SIZE as f64,
-                TILE_SIZE as f64,
-            );
-
-        self.gl.draw(args.viewport(), |c, gl| {
-            // Clear the screen.
-            clear(GREEN, gl);
-
-            // Draw boxes
-            for square in squares {
-                rectangle(RED, square, c.transform, gl);
-            }
-            rectangle(RED, apple, c.transform, gl);
-        });
+        
+        self.gl.draw_begin(args.viewport());
+        
+        clear(GREEN, &mut self.gl);
+        self.snake.draw(&mut self.gl, args);
+        self.apple.draw(&mut self.gl, args);
+        
+        self.gl.draw_end();
     }
 
     fn update(&mut self, args: &UpdateArgs) {
