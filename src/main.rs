@@ -3,8 +3,8 @@ extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
 
-mod snake;
 mod input;
+mod snake;
 
 use glutin_window::GlutinWindow as Window;
 use input::Press;
@@ -17,7 +17,7 @@ use snake::Snake;
 pub const SPEED: f64 = 1.0;
 pub const BOARD_SIZE: u32 = 200;
 pub const TILE_SIZE: u32 = 20;
-pub const UPDATE_TIME: f64 = 0.15;
+pub const UPDATE_TIME: f64 = 0.1;
 
 pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
@@ -33,29 +33,29 @@ impl App {
         const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
         const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
 
-        let (x, y) = (
-            self.snake.position.x * TILE_SIZE as f64,
-            self.snake.position.y * TILE_SIZE as f64,
-        );
-        let square = rectangle::square(x, y, TILE_SIZE as f64);
+        let squares = self.snake.tail
+            .clone()
+            .into_iter()
+            .map(|vec| rectangle::square(vec.x * TILE_SIZE as f64, vec.y  * TILE_SIZE as f64, TILE_SIZE as f64));
 
         self.gl.draw(args.viewport(), |c, gl| {
             // Clear the screen.
             clear(GREEN, gl);
 
-            let transform = c.transform;
-
-            // Draw a box
-            rectangle(RED, square, transform, gl);
+            // Draw boxes
+            for square in squares {
+                rectangle(RED, square, c.transform, gl);
+            }
         });
     }
 
     fn update(&mut self, args: &UpdateArgs) {
         self.time += args.dt;
+        self.snake.update_press(&mut self.current_press);
         if self.time > UPDATE_TIME {
             self.time = 0.0;
+            self.snake.update();
         }
-        self.snake.update(&mut self.current_press);
     }
 
     fn input(&mut self, button: &Button) {
