@@ -56,6 +56,7 @@ impl App {
         let apple_position = self.apple.position;
         if head ==  apple_position {
             self.apple.eat();
+            self.snake.grow();
         }
 
         if self.time > UPDATE_TIME {

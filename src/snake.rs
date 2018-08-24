@@ -24,6 +24,11 @@ impl Snake {
         self.tail.first().unwrap().clone()
     }
 
+    pub fn grow(&mut self) {
+        let tail = self.tail.last().unwrap().clone();
+        self.tail.push(tail);
+    }
+
     pub fn update_direction(&mut self, press: &mut Press) {
         match press {
             Press::Left => self.direction = Vector { x: -1.0, y: 0.0 },
