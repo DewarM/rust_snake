@@ -1,27 +1,31 @@
-use vector::Vector;
-use rand::prelude::*;
 use graphics::rectangle;
-use TILE_SIZE;
-use piston::input::RenderArgs;
 use opengl_graphics::GlGraphics;
+use piston::input::RenderArgs;
+use rand::prelude::*;
+use vector::Vector;
+
+use BOARD_SIZE;
+use TILE_SIZE;
 
 pub struct Apple {
-    pub position: Vector
+    pub position: Vector,
 }
 
 impl Apple {
-
     pub fn new() -> Self {
         Apple {
-            position: Vector { x: 0.0, y: 0.0 }
+            position: Vector { x: 0.0, y: 0.0 },
         }
     }
 
     pub fn eat(&mut self) {
         let mut rng = thread_rng();
-        let x = rng.gen_range(0, 10);
-        let y = rng.gen_range(0, 10);
-        self.position = Vector { x: x as f64, y: y as f64};
+        let x = rng.gen_range(0, BOARD_SIZE / TILE_SIZE);
+        let y = rng.gen_range(0, BOARD_SIZE / TILE_SIZE);
+        self.position = Vector {
+            x: x as f64,
+            y: y as f64,
+        };
     }
 
     pub fn draw(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {

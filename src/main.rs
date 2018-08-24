@@ -85,7 +85,7 @@ fn main() {
     // Create an Glutin window.
     let mut window: Window = WindowSettings::new(
         "moving square",
-        [BOARD_SIZE * TILE_SIZE, BOARD_SIZE * TILE_SIZE],
+        [BOARD_SIZE, BOARD_SIZE],
     ).opengl(opengl)
         .exit_on_esc(true)
         .build()
