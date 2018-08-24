@@ -5,6 +5,15 @@ use opengl_graphics::{GlGraphics};
 use piston::input::*;
 use TILE_SIZE;
 
+fn dissallowed_press(press: &Press) -> Press {
+    match press {
+        Press::Left => Press::Right,
+        Press::Right => Press::Left,
+        Press::Up => Press::Down,
+        Press::Down => Press::Up
+    }
+}
+
 impl Snake {
     pub fn new() -> Self {
         let direction = Vector { x: 1.0, y: 0.0 };
@@ -15,6 +24,7 @@ impl Snake {
         ];
 
         Snake {
+            last_press: Press::Right,
             direction: direction,
             tail: tail,
         }
@@ -29,12 +39,16 @@ impl Snake {
         self.tail.push(tail);
     }
 
-    pub fn update_direction(&mut self, press: &mut Press) {
-        match press {
-            Press::Left => self.direction = Vector { x: -1.0, y: 0.0 },
-            Press::Right => self.direction = Vector { x: 1.0, y: 0.0 },
-            Press::Up => self.direction = Vector { x: 0.0, y: -1.0 },
-            Press::Down => self.direction = Vector { x: 0.0, y: 1.0 },
+    pub fn update_direction(&mut self, press: &Press) {
+        let new_direction = match press {
+            Press::Left => Vector { x: -1.0, y: 0.0 },
+            Press::Right => Vector { x: 1.0, y: 0.0 },
+            Press::Up => Vector { x: 0.0, y: -1.0 },
+            Press::Down => Vector { x: 0.0, y: 1.0 },
+        };
+        if *press != dissallowed_press(&self.last_press) {
+            self.direction = new_direction;
+            self.last_press = press.clone();
         }
     }
 
@@ -65,6 +79,7 @@ impl Snake {
 }
 
 pub struct Snake {
+    last_press: Press,
     pub direction: Vector,
     pub tail: Vec<Vector>,
 }

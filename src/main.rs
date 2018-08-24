@@ -49,7 +49,7 @@ impl App {
 
     fn update(&mut self, args: &UpdateArgs) {
         self.time += args.dt;
-        self.snake.update_direction(&mut self.current_press);
+        self.snake.update_direction(&self.current_press);
         
         // detect collision
         let head = self.snake.head();
