@@ -20,6 +20,10 @@ impl Snake {
         }
     }
 
+    pub fn head(&mut self) -> Vector {
+        self.tail.first().unwrap().clone()
+    }
+
     pub fn update_direction(&mut self, press: &mut Press) {
         match press {
             Press::Left => self.direction = Vector { x: -1.0, y: 0.0 },

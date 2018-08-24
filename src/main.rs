@@ -50,6 +50,14 @@ impl App {
     fn update(&mut self, args: &UpdateArgs) {
         self.time += args.dt;
         self.snake.update_direction(&mut self.current_press);
+        
+        // detect collision
+        let head = self.snake.head();
+        let apple_position = self.apple.position;
+        if head ==  apple_position {
+            self.apple.eat();
+        }
+
         if self.time > UPDATE_TIME {
             self.time = 0.0;
             self.snake.update();

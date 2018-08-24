@@ -17,11 +17,11 @@ impl Apple {
         }
     }
 
-    pub fn eat(mut self) {
+    pub fn eat(&mut self) {
         let mut rng = thread_rng();
-        let x = rng.gen_range(0.0, 10.0);
-        let y = rng.gen_range(0.0, 10.0);
-        self.position = Vector { x: x, y: y};
+        let x = rng.gen_range(0, 10);
+        let y = rng.gen_range(0, 10);
+        self.position = Vector { x: x as f64, y: y as f64};
     }
 
     pub fn draw(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {

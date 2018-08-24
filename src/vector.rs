@@ -12,3 +12,9 @@ impl Vector {
         }
     }
 }
+
+impl PartialEq for Vector {
+    fn eq(&self, other: &Vector) -> bool {
+        self.x == other.x && self.y == other.y
+    }
+}
