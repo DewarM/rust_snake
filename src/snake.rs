@@ -1,9 +1,10 @@
+use apple::Apple;
 use graphics::rectangle;
 use input::Press;
-use apple::Apple;
 use opengl_graphics::GlGraphics;
 use piston::input::*;
 use vector::Vector;
+use BOARD_SIZE;
 use TILE_SIZE;
 
 fn dissallowed_press(press: &Press) -> Press {
@@ -28,6 +29,7 @@ impl Snake {
             last_press: Press::Left,
             direction: direction,
             tail: tail,
+            input_processed: false,
         }
     }
 
@@ -48,30 +50,55 @@ impl Snake {
 
     pub fn tail_collision(&mut self) -> bool {
         let head = self.head();
-        self.tail.clone().into_iter().skip(1).fold(false, |acc, tail_vec| {
-            acc || head == tail_vec
-        })
+        self.tail
+            .clone()
+            .into_iter()
+            .skip(1)
+            .fold(false, |acc, tail_vec| acc || head == tail_vec)
     }
 
     pub fn update_direction(&mut self, press: &Press) {
-        let new_direction = match press {
-            Press::Left => Vector { x: -1.0, y: 0.0 },
-            Press::Right => Vector { x: 1.0, y: 0.0 },
-            Press::Up => Vector { x: 0.0, y: -1.0 },
-            Press::Down => Vector { x: 0.0, y: 1.0 },
-        };
-        if *press != dissallowed_press(&self.last_press) {
-            self.direction = new_direction;
-            self.last_press = press.clone();
+        if self.input_processed {
+            let new_direction = match press {
+                Press::Left => Vector { x: -1.0, y: 0.0 },
+                Press::Right => Vector { x: 1.0, y: 0.0 },
+                Press::Up => Vector { x: 0.0, y: -1.0 },
+                Press::Down => Vector { x: 0.0, y: 1.0 },
+            };
+            if *press != dissallowed_press(&self.last_press) {
+                self.direction = new_direction;
+                self.last_press = press.clone();
+                self.input_processed = false;
+            }
         }
     }
 
     pub fn update(&mut self) {
         let mut tail = self.tail.clone();
-        let new_head = self.head().add(&self.direction);
+        let mut new_head = self.head().add(&self.direction);
+
+        let max_length = BOARD_SIZE as f64 / TILE_SIZE as f64;
+
+        if new_head.x >= max_length {
+            new_head.x = 0.0;
+        }
+
+        if new_head.x < 0.0 {
+            new_head.x = max_length - 1.0;
+        }
+
+        if new_head.y >= max_length {
+            new_head.y = 0.0;
+        }
+
+        if new_head.y < 0.0 {
+            new_head.y = max_length - 1.0;
+        }
+
         tail.pop();
         self.tail = vec![new_head];
         self.tail.append(&mut tail);
+        self.input_processed = true;
     }
 
     pub fn draw(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
@@ -94,6 +121,7 @@ impl Snake {
 
 pub struct Snake {
     last_press: Press,
+    input_processed: bool,
     pub direction: Vector,
     pub tail: Vec<Vector>,
 }
@@ -113,9 +141,9 @@ mod tests {
     fn update_has_correct_tail_vecs() {
         let mut snake = Snake::new();
         snake.update();
-        let mut tail_iter = snake.tail.into_iter(); 
-        assert_eq!(tail_iter.next().unwrap(), Vector {x: 0.0, y: 0.0 });
-        assert_eq!(tail_iter.next().unwrap(), Vector {x: 1.0, y: 0.0 });
-        assert_eq!(tail_iter.next().unwrap(), Vector {x: 2.0, y: 0.0 });
+        let mut tail_iter = snake.tail.into_iter();
+        assert_eq!(tail_iter.next().unwrap(), Vector { x: 0.0, y: 0.0 });
+        assert_eq!(tail_iter.next().unwrap(), Vector { x: 1.0, y: 0.0 });
+        assert_eq!(tail_iter.next().unwrap(), Vector { x: 2.0, y: 0.0 });
     }
 }

@@ -27,14 +27,13 @@ pub struct App {
     gl: GlGraphics, // OpenGL drawing backend.
     snake: Snake,
     apple: Apple,
-    current_press: Press,
     time: f64,
-    state: GameState
+    state: GameState,
 }
 
 enum GameState {
     Running,
-    Over
+    Over,
 }
 
 impl App {
@@ -56,7 +55,6 @@ impl App {
         match self.state {
             GameState::Running => {
                 self.time += args.dt;
-                self.snake.update_direction(&self.current_press);
 
                 if self.snake.tail_collision() {
                     self.state = GameState::Over;
@@ -72,27 +70,25 @@ impl App {
                     self.snake.update();
                 }
             }
-            GameState::Over => ()
+            GameState::Over => (),
         }
-        
     }
 
     fn reset(&mut self) {
         self.snake = Snake::new();
         self.apple = Apple::new();
-        self.current_press = Press::Right;
         self.time = 0.0;
         self.state = GameState::Running;
     }
 
     fn input(&mut self, button: &Button) {
         match button {
-            Button::Keyboard(Key::A) => self.current_press = Press::Left,
-            Button::Keyboard(Key::S) => self.current_press = Press::Down,
-            Button::Keyboard(Key::W) => self.current_press = Press::Up,
-            Button::Keyboard(Key::D) => self.current_press = Press::Right,
+            Button::Keyboard(Key::A) => self.snake.update_direction(&Press::Left),
+            Button::Keyboard(Key::S) => self.snake.update_direction(&Press::Down),
+            Button::Keyboard(Key::W) => self.snake.update_direction(&Press::Up),
+            Button::Keyboard(Key::D) => self.snake.update_direction(&Press::Right),
             Button::Keyboard(Key::P) => self.reset(),
-            _ => ()
+            _ => (),
         }
     }
 }
@@ -113,9 +109,8 @@ fn main() {
         gl: GlGraphics::new(opengl),
         snake: Snake::new(),
         apple: Apple::new(),
-        current_press: Press::Right,
         time: 0.0,
-        state: GameState::Running
+        state: GameState::Running,
     };
 
     let mut events = Events::new(EventSettings::new());
