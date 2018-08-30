@@ -19,7 +19,6 @@ use piston::input::*;
 use piston::window::WindowSettings;
 use snake::Snake;
 
-pub const SPEED: f64 = 1.0;
 pub const BOARD_SIZE: u32 = 200;
 pub const TILE_SIZE: u32 = 20;
 pub const UPDATE_TIME: f64 = 0.1;
@@ -60,7 +59,6 @@ impl App {
                 self.snake.update_direction(&self.current_press);
 
                 if self.snake.tail_collision() {
-                    println!("collision");
                     self.state = GameState::Over;
                 }
 
@@ -93,12 +91,8 @@ impl App {
             Button::Keyboard(Key::S) => self.current_press = Press::Down,
             Button::Keyboard(Key::W) => self.current_press = Press::Up,
             Button::Keyboard(Key::D) => self.current_press = Press::Right,
-            Button::Keyboard(Key::P) => {
-                self.reset();
-            }
-            _ => {
-                println!("something else");
-            }
+            Button::Keyboard(Key::P) => self.reset(),
+            _ => ()
         }
     }
 }
@@ -108,7 +102,7 @@ fn main() {
     let opengl = OpenGL::V3_2;
 
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new("moving square", [BOARD_SIZE, BOARD_SIZE])
+    let mut window: Window = WindowSettings::new("Snake", [BOARD_SIZE, BOARD_SIZE])
         .opengl(opengl)
         .exit_on_esc(true)
         .build()
