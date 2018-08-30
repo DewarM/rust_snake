@@ -17,7 +17,7 @@ fn dissallowed_press(press: &Press) -> Press {
 
 impl Snake {
     pub fn new() -> Self {
-        let direction = Vector { x: 1.0, y: 0.0 };
+        let direction = Vector { x: -1.0, y: 0.0 };
         let tail = vec![
             Vector { x: 1.0, y: 0.0 },
             Vector { x: 2.0, y: 0.0 },
@@ -25,7 +25,7 @@ impl Snake {
         ];
 
         Snake {
-            last_press: Press::Right,
+            last_press: Press::Left,
             direction: direction,
             tail: tail,
         }
@@ -46,6 +46,13 @@ impl Snake {
         head == apple_position
     }
 
+    pub fn tail_collision(&mut self) -> bool {
+        let head = self.head();
+        self.tail.clone().into_iter().skip(1).fold(false, |acc, tail_vec| {
+            acc || head == tail_vec
+        })
+    }
+
     pub fn update_direction(&mut self, press: &Press) {
         let new_direction = match press {
             Press::Left => Vector { x: -1.0, y: 0.0 },
@@ -61,9 +68,9 @@ impl Snake {
 
     pub fn update(&mut self) {
         let mut tail = self.tail.clone();
-        let head = tail.first().unwrap().add(&self.direction);
+        let new_head = self.head().add(&self.direction);
         tail.pop();
-        self.tail = vec![head];
+        self.tail = vec![new_head];
         self.tail.append(&mut tail);
     }
 
@@ -89,4 +96,26 @@ pub struct Snake {
     last_press: Press,
     pub direction: Vector,
     pub tail: Vec<Vector>,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn update_has_correct_tail_length() {
+        let mut snake = Snake::new();
+        snake.update();
+        assert_eq!(snake.tail.len(), 3);
+    }
+
+    #[test]
+    fn update_has_correct_tail_vecs() {
+        let mut snake = Snake::new();
+        snake.update();
+        let mut tail_iter = snake.tail.into_iter(); 
+        assert_eq!(tail_iter.next().unwrap(), Vector {x: 0.0, y: 0.0 });
+        assert_eq!(tail_iter.next().unwrap(), Vector {x: 1.0, y: 0.0 });
+        assert_eq!(tail_iter.next().unwrap(), Vector {x: 2.0, y: 0.0 });
+    }
 }

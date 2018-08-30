@@ -30,6 +30,12 @@ pub struct App {
     apple: Apple,
     current_press: Press,
     time: f64,
+    state: GameState
+}
+
+enum GameState {
+    Running,
+    Over
 }
 
 impl App {
@@ -48,18 +54,37 @@ impl App {
     }
 
     fn update(&mut self, args: &UpdateArgs) {
-        self.time += args.dt;
-        self.snake.update_direction(&self.current_press);
+        match self.state {
+            GameState::Running => {
+                self.time += args.dt;
+                self.snake.update_direction(&self.current_press);
 
-        if self.snake.apple_collision(&mut self.apple) {
-            self.apple.eat();
-            self.snake.grow();
-        }
+                if self.snake.tail_collision() {
+                    println!("collision");
+                    self.state = GameState::Over;
+                }
 
-        if self.time > UPDATE_TIME {
-            self.time = 0.0;
-            self.snake.update();
+                if self.snake.apple_collision(&mut self.apple) {
+                    self.apple.eat();
+                    self.snake.grow();
+                }
+
+                if self.time > UPDATE_TIME {
+                    self.time = 0.0;
+                    self.snake.update();
+                }
+            }
+            GameState::Over => ()
         }
+        
+    }
+
+    fn reset(&mut self) {
+        self.snake = Snake::new();
+        self.apple = Apple::new();
+        self.current_press = Press::Right;
+        self.time = 0.0;
+        self.state = GameState::Running;
     }
 
     fn input(&mut self, button: &Button) {
@@ -68,6 +93,9 @@ impl App {
             Button::Keyboard(Key::S) => self.current_press = Press::Down,
             Button::Keyboard(Key::W) => self.current_press = Press::Up,
             Button::Keyboard(Key::D) => self.current_press = Press::Right,
+            Button::Keyboard(Key::P) => {
+                self.reset();
+            }
             _ => {
                 println!("something else");
             }
@@ -93,6 +121,7 @@ fn main() {
         apple: Apple::new(),
         current_press: Press::Right,
         time: 0.0,
+        state: GameState::Running
     };
 
     let mut events = Events::new(EventSettings::new());
