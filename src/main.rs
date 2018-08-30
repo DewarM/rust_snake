@@ -51,9 +51,7 @@ impl App {
         self.time += args.dt;
         self.snake.update_direction(&self.current_press);
 
-        // detect collision
-        
-        if self.snake.detect_apple_collision(&mut self.apple) {
+        if self.snake.apple_collision(&mut self.apple) {
             self.apple.eat();
             self.snake.grow();
         }

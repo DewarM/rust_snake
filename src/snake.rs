@@ -40,7 +40,7 @@ impl Snake {
         self.tail.push(tail);
     }
 
-    pub fn detect_apple_collision(&mut self, apple: &mut Apple) -> bool {
+    pub fn apple_collision(&mut self, apple: &mut Apple) -> bool {
         let head = self.head();
         let apple_position = apple.position;
         head == apple_position
