@@ -10,8 +10,8 @@ mod snake;
 mod vector;
 
 use apple::Apple;
-use input::Press;
 use glutin_window::GlutinWindow as Window;
+use input::Press;
 
 use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
@@ -37,24 +37,23 @@ impl App {
         use graphics::*;
 
         const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-        
+
         self.gl.draw_begin(args.viewport());
-        
+
         clear(GREEN, &mut self.gl);
         self.snake.draw(&mut self.gl, args);
         self.apple.draw(&mut self.gl, args);
-        
+
         self.gl.draw_end();
     }
 
     fn update(&mut self, args: &UpdateArgs) {
         self.time += args.dt;
         self.snake.update_direction(&self.current_press);
-        
+
         // detect collision
-        let head = self.snake.head();
-        let apple_position = self.apple.position;
-        if head ==  apple_position {
+        
+        if self.snake.detect_apple_collision(&mut self.apple) {
             self.apple.eat();
             self.snake.grow();
         }
@@ -83,10 +82,8 @@ fn main() {
     let opengl = OpenGL::V3_2;
 
     // Create an Glutin window.
-    let mut window: Window = WindowSettings::new(
-        "moving square",
-        [BOARD_SIZE, BOARD_SIZE],
-    ).opengl(opengl)
+    let mut window: Window = WindowSettings::new("moving square", [BOARD_SIZE, BOARD_SIZE])
+        .opengl(opengl)
         .exit_on_esc(true)
         .build()
         .unwrap();

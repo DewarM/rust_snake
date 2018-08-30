@@ -1,8 +1,9 @@
-use input::Press;
-use vector::Vector;
 use graphics::rectangle;
-use opengl_graphics::{GlGraphics};
+use input::Press;
+use apple::Apple;
+use opengl_graphics::GlGraphics;
 use piston::input::*;
+use vector::Vector;
 use TILE_SIZE;
 
 fn dissallowed_press(press: &Press) -> Press {
@@ -10,7 +11,7 @@ fn dissallowed_press(press: &Press) -> Press {
         Press::Left => Press::Right,
         Press::Right => Press::Left,
         Press::Up => Press::Down,
-        Press::Down => Press::Up
+        Press::Down => Press::Up,
     }
 }
 
@@ -37,6 +38,12 @@ impl Snake {
     pub fn grow(&mut self) {
         let tail = self.tail.last().unwrap().clone();
         self.tail.push(tail);
+    }
+
+    pub fn detect_apple_collision(&mut self, apple: &mut Apple) -> bool {
+        let head = self.head();
+        let apple_position = apple.position;
+        head == apple_position
     }
 
     pub fn update_direction(&mut self, press: &Press) {
