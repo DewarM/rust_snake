@@ -75,7 +75,7 @@ impl Snake {
     }
 
     pub fn draw(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
-        const RED: [f32; 4] = [1.0, 0.0, 0.0, 1.0];
+        const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
         let squares = self.tail.clone().into_iter().map(|vec| {
             rectangle::square(
                 vec.x * TILE_SIZE as f64,
@@ -86,7 +86,7 @@ impl Snake {
         gl.draw(args.viewport(), |c, gl| {
             // Draw boxes
             for square in squares {
-                rectangle(RED, square, c.transform, gl);
+                rectangle(GREEN, square, c.transform, gl);
             }
         });
     }

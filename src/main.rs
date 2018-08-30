@@ -41,11 +41,11 @@ impl App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
 
-        const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+        const WHITE: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
         self.gl.draw_begin(args.viewport());
 
-        clear(GREEN, &mut self.gl);
+        clear(WHITE, &mut self.gl);
         self.snake.draw(&mut self.gl, args);
         self.apple.draw(&mut self.gl, args);
 
