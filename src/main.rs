@@ -87,7 +87,7 @@ impl App {
             Button::Keyboard(Key::S) => self.snake.update_direction(&Press::Down),
             Button::Keyboard(Key::W) => self.snake.update_direction(&Press::Up),
             Button::Keyboard(Key::D) => self.snake.update_direction(&Press::Right),
-            Button::Keyboard(Key::P) => self.reset(),
+            Button::Keyboard(Key::R) => self.reset(),
             _ => (),
         }
     }
