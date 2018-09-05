@@ -78,20 +78,21 @@ impl Snake {
         let mut new_head = self.head().add(&self.direction);
 
         let max_length = BOARD_SIZE as f64 / TILE_SIZE as f64;
-
+        let min_length = 0.0;
+        
         if new_head.x >= max_length {
-            new_head.x = 0.0;
+            new_head.x = min_length;
         }
 
-        if new_head.x < 0.0 {
+        if new_head.x < min_length {
             new_head.x = max_length - 1.0;
         }
 
         if new_head.y >= max_length {
-            new_head.y = 0.0;
+            new_head.y = min_length;
         }
 
-        if new_head.y < 0.0 {
+        if new_head.y < min_length {
             new_head.y = max_length - 1.0;
         }
 
