@@ -1,6 +1,7 @@
 extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
+extern crate find_folder;
 extern crate piston;
 extern crate rand;
 
@@ -8,6 +9,7 @@ mod apple;
 mod input;
 mod snake;
 mod vector;
+mod score;
 
 use apple::Apple;
 use glutin_window::GlutinWindow as Window;
@@ -18,12 +20,14 @@ use piston::event_loop::*;
 use piston::input::*;
 use piston::window::WindowSettings;
 use snake::Snake;
+use score::Display;
 
 pub const BOARD_SIZE: u32 = 200;
 pub const TILE_SIZE: u32 = 20;
 pub const UPDATE_TIME: f64 = 0.1;
 
 pub struct App {
+    
     gl: GlGraphics, // OpenGL drawing backend.
     snake: Snake,
     apple: Apple,
@@ -39,12 +43,13 @@ enum GameState {
 impl App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
-
         const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
 
         self.gl.draw_begin(args.viewport());
-
+        
         clear(BLACK, &mut self.gl);
+        let mut d = Display {};
+        d.draw(&mut self.gl, args);
         self.snake.draw(&mut self.gl, args);
         self.apple.draw(&mut self.gl, args);
 
@@ -106,6 +111,7 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App {
+        
         gl: GlGraphics::new(opengl),
         snake: Snake::new(),
         apple: Apple::new(),
