@@ -27,7 +27,7 @@ pub const TILE_SIZE: u32 = 20;
 pub const UPDATE_TIME: f64 = 0.1;
 
 pub struct App {
-    
+    display: Display,
     gl: GlGraphics, // OpenGL drawing backend.
     snake: Snake,
     apple: Apple,
@@ -48,8 +48,8 @@ impl App {
         self.gl.draw_begin(args.viewport());
         
         clear(BLACK, &mut self.gl);
-        let mut d = Display {};
-        d.draw(&mut self.gl, args);
+        
+        self.display.draw(&mut self.gl, args);
         self.snake.draw(&mut self.gl, args);
         self.apple.draw(&mut self.gl, args);
 
@@ -68,6 +68,7 @@ impl App {
                 if self.snake.apple_collision(&mut self.apple) {
                     self.apple.eat();
                     self.snake.grow();
+                    self.display.increment();
                 }
 
                 if self.time > UPDATE_TIME {
@@ -80,6 +81,9 @@ impl App {
     }
 
     fn reset(&mut self) {
+        self.display = Display {
+            score: 0
+        };
         self.snake = Snake::new();
         self.apple = Apple::new();
         self.time = 0.0;
@@ -111,7 +115,9 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App {
-        
+        display: Display {
+            score: 0
+        },
         gl: GlGraphics::new(opengl),
         snake: Snake::new(),
         apple: Apple::new(),

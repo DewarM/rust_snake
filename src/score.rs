@@ -4,9 +4,16 @@ extern crate texture;
 use opengl_graphics::{GlGraphics, GlyphCache};
 use piston::input::RenderArgs;
 
-pub struct Display {}
+pub struct Display {
+    pub score: i32
+}
 
 impl Display {
+
+    pub fn increment(&mut self) {
+        self.score += 1;
+    }
+
     pub fn draw(&mut self, gl: &mut GlGraphics, args: &RenderArgs ) {
         use graphics::*;
 
@@ -20,7 +27,7 @@ impl Display {
         gl.draw(args.viewport(), |c, gl| {
             let transform = c.transform.trans(0.0, 32.0);
             text::Text::new_color([1.0, 0.0, 0.0, 1.0], 32).draw(
-                "1",
+                &self.score.to_string(),
                 &mut glyphs,
                 &c.draw_state,
                 transform, gl
