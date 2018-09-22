@@ -1,10 +1,8 @@
 use graphics::rectangle;
 use opengl_graphics::GlGraphics;
 use piston::input::RenderArgs;
-use rand::prelude::*;
 use vector::Vector;
 
-use BOARD_SIZE;
 use TILE_SIZE;
 
 pub struct Apple {

@@ -10,95 +10,40 @@ mod input;
 mod snake;
 mod vector;
 mod score;
+mod game;
 
-use apple::Apple;
 use glutin_window::GlutinWindow as Window;
-use input::Press;
-
-use opengl_graphics::{GlGraphics, OpenGL};
 use piston::event_loop::*;
 use piston::input::*;
+use opengl_graphics::{GlGraphics, OpenGL};
 use piston::window::WindowSettings;
-use snake::Snake;
-use score::Display;
+
+use game::Game;
 
 pub const BOARD_SIZE: u32 = 200;
 pub const TILE_SIZE: u32 = 20;
 pub const UPDATE_TIME: f64 = 0.1;
 
 pub struct App {
-    display: Display,
+    
     gl: GlGraphics, // OpenGL drawing backend.
-    snake: Snake,
-    apple: Apple,
-    time: f64,
-    state: GameState,
-}
-
-enum GameState {
-    Running,
-    Over,
+    game: Game
 }
 
 impl App {
     fn render(&mut self, args: &RenderArgs) {
-        use graphics::*;
-        const BLACK: [f32; 4] = [0.0, 0.0, 0.0, 1.0];
-
         self.gl.draw_begin(args.viewport());
-        
-        clear(BLACK, &mut self.gl);
-        
-        self.display.draw(&mut self.gl, args);
-        self.snake.draw(&mut self.gl, args);
-        self.apple.draw(&mut self.gl, args);
-
+        self.game.clear(&mut self.gl);
+        self.game.draw(&mut self.gl, args);
         self.gl.draw_end();
     }
 
     fn update(&mut self, args: &UpdateArgs) {
-        match self.state {
-            GameState::Running => {
-                self.time += args.dt;
-
-                if self.snake.tail_collision() {
-                    self.state = GameState::Over;
-                }
-
-                if self.snake.apple_collision(&mut self.apple) {
-                    self.apple.eat();
-                    self.snake.grow();
-                    self.display.increment();
-                }
-
-                if self.time > UPDATE_TIME {
-                    self.time = 0.0;
-                    self.snake.update();
-                }
-            }
-            GameState::Over => (),
-        }
-    }
-
-    fn reset(&mut self) {
-        self.display = Display {
-            score: 0
-        };
-        self.snake = Snake::new();
-        self.apple = Apple::new();
-        self.time = 0.0;
-        self.state = GameState::Running;
+        self.game.update(args);
     }
 
     fn input(&mut self, button: &Button) {
-        match button {
-            Button::Keyboard(Key::A) => self.snake.update_direction(&Press::Left),
-            Button::Keyboard(Key::S) => self.snake.update_direction(&Press::Down),
-            Button::Keyboard(Key::W) => self.snake.update_direction(&Press::Up),
-            Button::Keyboard(Key::D) => self.snake.update_direction(&Press::Right),
-            Button::Keyboard(Key::R) => self.reset(),
-            _ => (),
-        }
+        self.game.handle_input(button);
     }
 }
 
@@ -115,14 +60,8 @@ fn main() {
 
     // Create a new game and run it.
     let mut app = App {
-        display: Display {
-            score: 0
-        },
         gl: GlGraphics::new(opengl),
-        snake: Snake::new(),
-        apple: Apple::new(),
-        time: 0.0,
-        state: GameState::Running,
+        game: Game::new()
     };
 
     let mut events = Events::new(EventSettings::new());
