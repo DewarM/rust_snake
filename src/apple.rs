@@ -4,6 +4,7 @@ use piston::input::RenderArgs;
 use vector::Vector;
 
 use TILE_SIZE;
+use BOARD_SIZE;
 
 pub struct Apple {
     pub position: Vector,
@@ -12,12 +13,12 @@ pub struct Apple {
 impl Apple {
     pub fn new() -> Self {
         Apple {
-            position: Vector::rand(),
+            position: Vector::rand(0, BOARD_SIZE / TILE_SIZE),
         }
     }
 
     pub fn eat(&mut self) {
-        self.position = Vector::rand();
+        self.position = Vector::rand(0, BOARD_SIZE / TILE_SIZE);
     }
 
     pub fn draw(&mut self, gl: &mut GlGraphics, args: &RenderArgs) {
